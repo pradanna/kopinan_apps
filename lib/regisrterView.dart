@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'controller/loginController.dart';
+import 'package:kopinan_spps/controller/registerController.dart';
 
-class LoginView extends StatelessWidget {
+class RegisterView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final LoginController controller = Get.find();
+    final RegisterController controller = Get.put(RegisterController());
+
     return Scaffold(
       body: Stack(
         children: [
@@ -28,7 +29,7 @@ class LoginView extends StatelessWidget {
               height: 50, // Adjust the height of the logo as needed
             ),
           ),
-          // Bottom sheet for login form
+          // Bottom sheet for register form
           DraggableScrollableSheet(
             initialChildSize: 0.5,
             minChildSize: 0.5,
@@ -50,12 +51,12 @@ class LoginView extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Login',
+                          'Register',
                           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                         ),
                         SizedBox(height: 5),
                         Text(
-                          'Masukan Email dan Password',
+                          'Please fill in the form to create an account',
                           style: TextStyle(fontSize: 12),
                         ),
                         SizedBox(height: 20),
@@ -63,7 +64,28 @@ class LoginView extends StatelessWidget {
                           Icons.email,
                           'Email',
                           onChanged: (value) => controller.email.value = value,
-                          borderColor: Colors.black, // Change border color here
+                          borderColor: Colors.black,
+                        ),
+                        SizedBox(height: 20),
+                        buildTextFieldWithIcon(
+                          Icons.person,
+                          'Full Name',
+                          onChanged: (value) => controller.fullName.value = value,
+                          borderColor: Colors.black,
+                        ),
+                        SizedBox(height: 20),
+                        buildTextFieldWithIcon(
+                          Icons.home,
+                          'Address',
+                          onChanged: (value) => controller.address.value = value,
+                          borderColor: Colors.black,
+                        ),
+                        SizedBox(height: 20),
+                        buildTextFieldWithIcon(
+                          Icons.phone,
+                          'Phone Number',
+                          onChanged: (value) => controller.phoneNumber.value = value,
+                          borderColor: Colors.black,
                         ),
                         SizedBox(height: 20),
                         buildTextFieldWithIcon(
@@ -71,7 +93,15 @@ class LoginView extends StatelessWidget {
                           'Password',
                           onChanged: (value) => controller.password.value = value,
                           obscureText: true,
-                          borderColor: Colors.black, // Change border color here
+                          borderColor: Colors.black,
+                        ),
+                        SizedBox(height: 20),
+                        buildTextFieldWithIcon(
+                          Icons.lock,
+                          'Confirm Password',
+                          onChanged: (value) => controller.confirmPassword.value = value,
+                          obscureText: true,
+                          borderColor: Colors.black,
                         ),
                         SizedBox(height: 50),
                         Obx(() => controller.isLoading.value
@@ -79,19 +109,23 @@ class LoginView extends StatelessWidget {
                             : SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed: controller.login,
+                            onPressed: controller.register,
                             style: ElevatedButton.styleFrom(
                               padding: EdgeInsets.symmetric(vertical: 15.0),
                               foregroundColor: Colors.white,
                               backgroundColor: Colors.lightBlue,
                             ),
-                            child: Text('Login'),
+                            child: Text('Register'),
                           ),
                         )),
-                        SizedBox(height: 20,),
-                        InkWell(onTap: (){
-                          Get.toNamed("/register");
-                        },child: Text("Belum punya akun? Daftar Sekarang", style: TextStyle(color: Colors.blue),),)
+                        SizedBox(height: 20),
+                        InkWell(
+                          onTap: () => Get.toNamed('/login'),
+                          child: Text(
+                            "Already have an account? Login",
+                            style: TextStyle(color: Colors.blue),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -109,7 +143,7 @@ class LoginView extends StatelessWidget {
       String labelText, {
         ValueChanged<String>? onChanged,
         bool obscureText = false,
-        Color borderColor = Colors.black, // Default border color
+        Color borderColor = Colors.black,
       }) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 15),
@@ -120,19 +154,19 @@ class LoginView extends StatelessWidget {
           prefixIcon: Icon(iconData),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(color: borderColor), // Border color
+            borderSide: BorderSide(color: borderColor),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(color: borderColor), // Focused border color
+            borderSide: BorderSide(color: borderColor),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(color: borderColor.withOpacity(0.2)), // Enabled border color
+            borderSide: BorderSide(color: borderColor.withOpacity(0.2)),
           ),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(color: Colors.black), // Error border color
+            borderSide: BorderSide(color: Colors.black),
           ),
         ),
         obscureText: obscureText,
