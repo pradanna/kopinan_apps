@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kopinan_spps/pesanView.dart';
+import 'package:kopinan_spps/profileView.dart';
 
 import 'controller/homeController.dart';
 import 'historyView.dart';
@@ -11,16 +12,14 @@ class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Home'),
-      ),
+
       body: Obx(() {
         return IndexedStack(
           index: controller.selectedIndex.value,
           children: [
             Pesanview(),
             HistoryView(),
-            Center(child: Text('Home Page')),
+            ProfileView()
           ],
         );
       }),
@@ -49,7 +48,4 @@ class HomeView extends StatelessWidget {
 
     );
   }
-}
-
-class ProfileView {
 }

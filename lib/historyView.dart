@@ -24,17 +24,33 @@ class HistoryView extends StatelessWidget {
             var order = controller.orderHistory[index];
             return Card(
               margin: EdgeInsets.all(10),
-              child: ListTile(
-                title: Text('Order ID: ${order['orderId']}'),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
                   children: [
-                    ...order['items'].map<Widget>((item) {
-                      return Text('${item['name']} x ${item['quantity']} - Rp ${item['price']}');
-                    }).toList(),
-                    SizedBox(height: 10),
-                    Text('Total Harga: Rp ${order['totalPrice']}'),
-                    Text('Tanggal: ${order['date']}'),
+                    ListTile(
+                      title: Text('Order ID: ${order['orderId']}'),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ...order['items'].map<Widget>((item) {
+                            return Text('${item['name']} x ${item['quantity']} - Rp ${item['price']}');
+                          }).toList(),
+                          SizedBox(height: 10),
+                          Text('Total Harga: Rp ${order['totalPrice']}'),
+                          Text('Tanggal: ${order['date']}'),
+                        ],
+                      ),
+                    ),
+                    Divider(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Status"),
+                        ElevatedButton(onPressed: (){}, child: Text('Show QR')),
+                      ],
+                    ),
                   ],
                 ),
               ),
