@@ -2,17 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:kopinan_spps/Components/colorsMaster.dart';
+import 'package:kopinan_spps/apiRequest/apiServices.dart';
 import 'package:kopinan_spps/controller/cartController.dart';
 import 'package:kopinan_spps/controller/pesanController.dart';
 
 import 'Components/menuItem.dart';
+import 'MenuDetailPage.dart';
 
 class Pesanview extends StatelessWidget {
   final PesanController controller = Get.put(PesanController());
   final CartController  cartController = Get.put(CartController());
 
+
   @override
   Widget build(BuildContext context) {
+
+    controller.getCategory();
+    controller.getProfile();
+    controller.getItems("1");
+    cartController.getCartItems();
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -41,16 +49,18 @@ class Pesanview extends StatelessWidget {
                                   fit: BoxFit
                                       .cover, // Menyesuaikan ukuran gambar sesuai dengan ukuran container
                                 )),
-                            child:  Column(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                crossAxisAlignment:
-                                CrossAxisAlignment.start,
-                                children: [
-                                  Text('Nama: ${controller.userName.value} ', style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold, color: Colors.white)),
-                                              Text('Nomor HP: ${controller.phoneNumber.value}', style: TextStyle(fontSize: 12.sp, color: Colors.white)),
+                            child:  Obx(() =>
+                             controller.isLoading.value ? Center(child: CircularProgressIndicator(),) :  Column(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                                  children: [
+                                    Text('Nama: ${controller.profileData['data']['username']} ', style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold, color: Colors.white)),
+                                                Text('Nomor HP: ${controller.profileData['data']['phone']}', style: TextStyle(fontSize: 12.sp, color: Colors.white)),
 
-                                ],
-                              ),
+                                  ],
+                                ),
+                            ),
                             ),
                         Positioned(
                             top: 20,
@@ -99,6 +109,8 @@ class Pesanview extends StatelessWidget {
                                 return GestureDetector(
                                   onTap: () {
                                     controller.selectedCategory.value = index;
+                                    // controller.categories[index] == "Semua" ? controller.getItems("0") :
+                                    controller.getItems(controller.categories['data'][index]["id"].toString());
                                   },
                                   child: Obx(() {
                                     return Container(
@@ -110,7 +122,7 @@ class Pesanview extends StatelessWidget {
                                       ),
                                       child: Center(
                                         child: Text(
-                                          controller.categories[index],
+                                          controller.categories['data'][index]['name'],
                                           style: TextStyle(color: controller.selectedCategory.value == index ? Colorsmaster.backgroundColor : Colors.white),
                                         ),
                                       ),
@@ -123,24 +135,37 @@ class Pesanview extends StatelessWidget {
                         ),
                         // Items Section
                         Expanded(
-                          child: Obx(() {
-                            var selectedCategory = controller.categories[controller.selectedCategory.value];
-                            var items = controller.items[selectedCategory]!;
-                            return ListView.builder(
+                          child:
+                            Obx(() {
+                              var items = controller.items.value;
+                            return controller.isLoadingItems.value ? Center(child: CircularProgressIndicator(),) : ListView.builder(
                               itemCount: items.length,
-                              itemBuilder: (context, index) {
-                                return  MenuItem(
-                                  imageUrl: 'https://static.promediateknologi.id/crop/0x0:0x0/0x0/webp/photo/riaupos/4919-img_6848.jpeg',
-                                  name: items[index],
-                                  price: 25000,
-                                  onAddToCart: (){ controller.addToCart(items[index]);
-                                  cartController.addToCart(items[index], 25000);
-                                  }
-                                );
+                              itemBuilder: (context, index){
+                                final item = items[index];
+                                return MenuItem(imageUrl: baseURL+ items[index]['image'], name: items[index]['name'], price: items[index]['price'], onAddToCart: (){Get.to(MenuItemDetailPage(menuItem: item));});
                               },
                             );
-                          }),
+
+                          // Obx(() {
+                          //   var selectedCategory = controller.categories['data'][0];
+                          //   var items = controller.itemsitem[selectedCategory]!;
+                          //   return ListView.builder(
+                          //     itemCount: items.length,
+                          //     itemBuilder: (context, index) {
+                          //       return  MenuItem(
+                          //         imageUrl: 'https://static.promediateknologi.id/crop/0x0:0x0/0x0/webp/photo/riaupos/4919-img_6848.jpeg',
+                          //         name: items[index],
+                          //         price: 25000,
+                          //         onAddToCart: (){ controller.addToCart(items[index]);
+                          //         cartController.addToCart(items[index], 25000);
+                          //         }
+                          //       );
+                          //     },
+                          //   );
+                          // }),
+                            }
                         ),
+                        )
                   ],
                 ),
               )
@@ -151,41 +176,43 @@ class Pesanview extends StatelessWidget {
 
 
       floatingActionButton: Obx(() {
-      return FloatingActionButton(
-        onPressed: () {
-          Get.toNamed('/cart');
-        },
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            Icon(Icons.shopping_cart),
-            if (controller.cartItemsCount.value > 0)
-              Positioned(
-                right: 0,
-                child: Container(
-                  padding: EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  constraints: BoxConstraints(
-                    minWidth: 18,
-                    minHeight: 18,
-                  ),
-                  child: Text(
-                    '${controller.cartItemsCount.value}',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
+        return FloatingActionButton(
+          onPressed: () {
+            Get.toNamed('/cart');
+          },
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Container(width: double.infinity, height: double.infinity,),
+              Icon(Icons.shopping_cart),
+              if (cartController.totalQuantity.value > -2)
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  child: Container(
+                    padding: EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    textAlign: TextAlign.center,
+                    constraints: BoxConstraints(
+                      minWidth: 18,
+                      minHeight: 18,
+                    ),
+                    child: Text(
+                      '${cartController.totalQuantity.value}',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
-                ),
-              )
-          ],
-        ),
-      );
-    }),
+                )
+            ],
+          ),
+        );
+      }),
     );
   }
 }

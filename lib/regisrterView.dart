@@ -75,11 +75,18 @@ class RegisterView extends StatelessWidget {
                         ),
                         SizedBox(height: 20),
                         buildTextFieldWithIcon(
-                          Icons.home,
-                          'Address',
-                          onChanged: (value) => controller.address.value = value,
+                          Icons.person,
+                          'Username',
+                          onChanged: (value) => controller.username.value = value,
                           borderColor: Colors.black,
                         ),
+                        // SizedBox(height: 20),
+                        // buildTextFieldWithIcon(
+                        //   Icons.home,
+                        //   'Address',
+                        //   onChanged: (value) => controller.address.value = value,
+                        //   borderColor: Colors.black,
+                        // ),
                         SizedBox(height: 20),
                         buildTextFieldWithIcon(
                           Icons.phone,

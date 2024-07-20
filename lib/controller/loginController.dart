@@ -1,36 +1,44 @@
+import 'package:dio/dio.dart' as dio;
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 import '../apiRequest/apiServices.dart';
 
 class LoginController extends GetxController {
-  var email = ''.obs;
+  var username = ''.obs;
   var password = ''.obs;
   var isLoading = false.obs;
   var errorMessage = ''.obs;
-  final ApiService _apiService = ApiService();
+
+  dio.Dio _dio = dio.Dio();
+  final GetStorage box = GetStorage();
 
   void login() async {
-    isLoading(true);
-    // Simulasikan proses login
 
-    // Jika login berhasil, navigasi ke halaman berikutnya
+    isLoading(true);
+
+    var formData = dio.FormData.fromMap({'username': username.value,
+      'password': password.value,});
+
     try {
-      print('try to Login ' + email.value + " " + password.value);
-      final response = await _apiService.login(email.value, password.value);
+      final response = await _dio.post(
+        baseURL+'/api/login',
+        data: formData, options: dio.Options(headers: {'Accept': 'application/json'})
+      );
 
       if (response.statusCode == 200) {
-        // Handle successful login
-        Get.offNamed("/home");
-        print('Login successful ' + response.toString());
+        Get.snackbar('Success', 'Login successful');
+        await box.write('token', response.data['data']['access_token']);
+
+        Get.offAllNamed('/home');
       } else {
-        errorMessage('Login failed: ${response.data['message']}');
+        Get.snackbar('Error', 'Login failed');
       }
     } catch (e) {
-      errorMessage('Login failed: $e');
+      Get.snackbar('Error', 'Terjadi Kesalahan');
       print(e);
     } finally {
       isLoading(false);
-      print('Login Finaly');
     }
   }
 }

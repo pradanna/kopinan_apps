@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:dio/dio.dart';
+import 'package:dio/dio.dart' as dio;
+
+import '../apiRequest/apiServices.dart';
 
 class RegisterController extends GetxController {
   var email = ''.obs;
   var fullName = ''.obs;
   var address = ''.obs;
+  var username = ''.obs;
   var phoneNumber = ''.obs;
   var password = ''.obs;
   var confirmPassword = ''.obs;
   var isLoading = false.obs;
 
-  Dio _dio = Dio();
+  dio.Dio _dio = dio.Dio();
 
   void register() async {
     if (password.value != confirmPassword.value) {
@@ -20,17 +23,19 @@ class RegisterController extends GetxController {
     }
 
     isLoading(true);
-
+    var formData = dio.FormData.fromMap({
+      'username': username.value,
+      'email': email.value,
+      'name': fullName.value,
+      'password': password.value,
+      // 'alamat': address.value,
+      'phone': phoneNumber.value,
+    },);
     try {
       final response = await _dio.post(
-        'https://yourapiurl.com/register',
-        data: {
-          'email': email.value,
-          'full_name': fullName.value,
-          'address': address.value,
-          'phone_number': phoneNumber.value,
-          'password': password.value,
-        },
+        baseURL+'/api/register',
+        data: formData,
+          options: dio.Options(headers: {'Accept': 'application/json'})
       );
 
       if (response.statusCode == 200) {
@@ -41,6 +46,7 @@ class RegisterController extends GetxController {
       }
     } catch (e) {
       Get.snackbar('Error', 'An error occurred');
+      print(e);
     } finally {
       isLoading(false);
     }

@@ -60,9 +60,9 @@ class LoginView extends StatelessWidget {
                         ),
                         SizedBox(height: 20),
                         buildTextFieldWithIcon(
-                          Icons.email,
-                          'Email',
-                          onChanged: (value) => controller.email.value = value,
+                          Icons.account_circle_rounded,
+                          'Username',
+                          onChanged: (value) => controller.username.value = value,
                           borderColor: Colors.black, // Change border color here
                         ),
                         SizedBox(height: 20),
